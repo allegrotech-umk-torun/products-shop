@@ -1,6 +1,7 @@
 plugins {
     id 'org.springframework.boot' version '2.1.4.RELEASE'
     id 'java'
+    id 'com.diffplug.gradle.spotless' version '3.23.0'
     id 'groovy'
 }
 
@@ -12,6 +13,14 @@ sourceCompatibility = '11'
 
 repositories {
     mavenCentral()
+}
+
+spotless {
+    java {
+        googleJavaFormat()
+        removeUnusedImports()
+        importOrder '', 'pl.allegrotech'
+    }
 }
 
 dependencies {
