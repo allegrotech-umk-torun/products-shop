@@ -34,13 +34,10 @@ class ProductFacadeImpl implements ProductFacade {
 
   @Override
   public ProductResponseDto get(String id) {
-    var product = productRepository.findById(id);
-
-    if (product == null) {
-      throw new ProductNotFoundException(id);
-    }
-
-    return new ProductResponseDto(product.getId(), product.getName());
+    return productRepository
+        .findById(id)
+        .map(product -> new ProductResponseDto(product.getId(), product.getName()))
+        .orElseThrow(() -> new ProductNotFoundException(id));
   }
 
   @Override
@@ -49,16 +46,23 @@ class ProductFacadeImpl implements ProductFacade {
       throw new ProductRequestNotValidException(productRequest);
     }
 
-    var product = productRepository.findById(productRequest.getId());
-    var productToUpdate =
-        new Product(product.getId(), productRequest.getName(), product.getCreatedAt());
-    var updatedProduct = productRepository.save(productToUpdate);
-
-    return new ProductResponseDto(updatedProduct.getId(), updatedProduct.getName());
+    return productRepository
+        .findById(productRequest.getId())
+        .map(
+            requestedProduct ->
+                new Product(
+                    requestedProduct.getId(),
+                    productRequest.getName(),
+                    requestedProduct.getCreatedAt()))
+        .map(product -> productRepository.save(product))
+        .map(
+            updatedProduct ->
+                new ProductResponseDto(updatedProduct.getId(), updatedProduct.getName()))
+        .orElseThrow(() -> new ProductNotFoundException(productRequest.getId()));
   }
 
   @Override
   public void delete(String id) {
-    productRepository.removeById(id);
+    productRepository.deleteById(id);
   }
 }

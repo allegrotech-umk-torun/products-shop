@@ -7,22 +7,23 @@ import org.springframework.stereotype.Repository;
 import pl.allegrotech.productsshop.domain.Product;
 
 @Repository
-class InMemoryProductRepository implements ProductRepository {
+// class InMemoryProductRepository implements ProductRepository {
+class InMemoryProductRepository {
 
   private final Map<String, Product> products = new HashMap<>();
 
-  @Override
+  //  @Override
   public Product save(Product product) {
     products.put(product.getId(), product);
     return product;
   }
 
-  @Override
+  //  @Override
   public Product findById(String id) {
     return products.get(id);
   }
 
-  @Override
+  //  @Override
   public void removeById(String id) {
     products.remove(id);
   }

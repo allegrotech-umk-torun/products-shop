@@ -2,10 +2,11 @@ package pl.allegrotech.productsshop.domain;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
+import org.springframework.data.annotation.Id;
 
 public final class Product {
 
-  private final String id;
+  @Id private final String id;
   private final String name;
   private final LocalDateTime createdAt;
 
