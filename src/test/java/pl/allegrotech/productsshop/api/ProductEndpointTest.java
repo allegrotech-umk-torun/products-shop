@@ -6,6 +6,7 @@ import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.http.HttpStatus.*;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -24,6 +25,7 @@ public class ProductEndpointTest extends IntegrationTest {
 
   @Autowired ProductRepository productRepository;
 
+  @Ignore
   @Test
   public void shouldCreateProduct() {
     // given
@@ -43,6 +45,7 @@ public class ProductEndpointTest extends IntegrationTest {
     assertThat(productResponse.getName()).isEqualTo("czerwona sukienka");
   }
 
+  @Ignore
   @Test
   public void shouldGetProduct() {
     // given
@@ -59,6 +62,7 @@ public class ProductEndpointTest extends IntegrationTest {
     assertThat(response.getBody()).isEqualTo(createdProduct);
   }
 
+  @Ignore
   @Test
   public void shouldGetNotFoundWhenProductIsNotAvailable() {
     // when
@@ -70,6 +74,7 @@ public class ProductEndpointTest extends IntegrationTest {
     assertThat(response.getBody()).isEqualTo("There is no product with id: dummyProductId");
   }
 
+  @Ignore
   @Test
   public void shouldUpdateProduct() {
     // given
@@ -94,6 +99,7 @@ public class ProductEndpointTest extends IntegrationTest {
     assertThat(productResponseDto.getName()).isEqualTo("samsung");
   }
 
+  @Ignore
   @Test
   public void shouldDeleteProduct() {
     // given
