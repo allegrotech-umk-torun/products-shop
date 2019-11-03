@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import javax.servlet.http.HttpServletRequest;
+
 @ControllerAdvice
 public class ApiExceptionHandler {
 
@@ -25,5 +27,11 @@ public class ApiExceptionHandler {
   @ExceptionHandler(ProductIdIncorrectException.class)
   public ResponseEntity handleProductIdIncorrect(ProductIdIncorrectException exception) {
     return new ResponseEntity(exception.getMessage(), HttpStatus.BAD_REQUEST);
+  }
+
+  @ExceptionHandler(TaskException.class)
+  @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+  public ResponseEntity handleTaskError(TaskException exception) {
+    return new ResponseEntity(exception.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);
   }
 }

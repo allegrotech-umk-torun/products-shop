@@ -18,6 +18,8 @@ import pl.allegrotech.productsshop.domain.ProductRequestDto;
 import pl.allegrotech.productsshop.domain.ProductResponseDto;
 import pl.allegrotech.productsshop.infrastructure.ProductRepository;
 
+import java.util.concurrent.ExecutionException;
+
 public class ProductEndpointTest extends IntegrationTest {
 
   @Autowired ProductFacade productFacade;
@@ -44,7 +46,7 @@ public class ProductEndpointTest extends IntegrationTest {
   }
 
   @Test
-  public void shouldGetProduct() {
+  public void shouldGetProduct() throws ExecutionException, InterruptedException {
     // given
     var product = new ProductRequestDto(null, "czerwona sukienka");
     var createdProduct = productFacade.create(product);
@@ -71,7 +73,7 @@ public class ProductEndpointTest extends IntegrationTest {
   }
 
   @Test
-  public void shouldUpdateProduct() {
+  public void shouldUpdateProduct() throws ExecutionException, InterruptedException {
     // given
     var productRequest = new ProductRequestDto(null, "iphone");
     var existingProduct = productFacade.create(productRequest);
@@ -95,7 +97,7 @@ public class ProductEndpointTest extends IntegrationTest {
   }
 
   @Test
-  public void shouldDeleteProduct() {
+  public void shouldDeleteProduct() throws ExecutionException, InterruptedException {
     // given
     var productRequest = new ProductRequestDto(null, "iphone");
     var existingProduct = productFacade.create(productRequest);

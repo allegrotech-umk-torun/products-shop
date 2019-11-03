@@ -15,6 +15,8 @@ import pl.allegrotech.productsshop.domain.ProductFacade;
 import pl.allegrotech.productsshop.domain.ProductRequestDto;
 import pl.allegrotech.productsshop.domain.ProductResponseDto;
 
+import java.util.concurrent.ExecutionException;
+
 @RestController
 @RequestMapping("/products")
 class ProductEndpoint {
@@ -26,12 +28,12 @@ class ProductEndpoint {
   }
 
   @GetMapping(value = "/{id}", produces = APPLICATION_JSON_VALUE)
-  ProductResponseDto getProduct(@PathVariable String id) {
+  ProductResponseDto getProduct(@PathVariable String id) throws ExecutionException, InterruptedException {
     return productFacade.get(id);
   }
 
   @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-  ProductResponseDto createProduct(@RequestBody ProductRequestDto productRequestDto) {
+  ProductResponseDto createProduct(@RequestBody ProductRequestDto productRequestDto) throws ExecutionException, InterruptedException {
     return productFacade.create(productRequestDto);
   }
 
