@@ -1,12 +1,14 @@
 package pl.allegrotech.productsshop.infrastructure;
 
 import java.util.Optional;
-import org.springframework.data.repository.CrudRepository;
 
-import org.springframework.data.repository.Repository;
+import org.springframework.data.mongodb.repository.MongoRepository;
+
+import org.springframework.stereotype.Repository;
 import pl.allegrotech.productsshop.domain.Product;
 
-public interface ProductRepository extends Repository<Product, String> {
+@Repository
+public interface ProductRepository extends MongoRepository<Product, String> {
 
   Product save(Product product);
 
@@ -14,3 +16,4 @@ public interface ProductRepository extends Repository<Product, String> {
 
   void deleteById(String id);
 }
+
