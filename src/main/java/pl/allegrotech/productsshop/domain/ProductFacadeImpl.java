@@ -2,9 +2,9 @@ package pl.allegrotech.productsshop.domain;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -25,10 +25,10 @@ class ProductFacadeImpl implements ProductFacade {
   private static Logger log = LoggerFactory.getLogger(ProductFacadeImpl.class);
   private static final ExecutorService createProductsThreadpool = new ThreadPoolExecutor(
       5,
-      40,
+      100,
       5,
       TimeUnit.SECONDS,
-      new LinkedBlockingQueue<>(1),
+      new LinkedBlockingQueue<>(5),
       new ThreadFactoryBuilder()
           .setNameFormat("createProduct-%d")
           .build(),
@@ -61,20 +61,7 @@ class ProductFacadeImpl implements ProductFacade {
 
   @Override
   public ProductResponseDto create(ProductRequestDto productRequest) throws ExecutionException, InterruptedException {
-      final var createProductTask = createProductsThreadpool.submit(() -> {
-          if (!productRequest.isValid()) {
-              throw new ProductRequestNotValidException(productRequest);
-          }
-
-          String id = UUID.randomUUID().toString();
-          LocalDateTime createdAt = LocalDateTime.now();
-          Product product = new Product(id, productRequest.getName(), createdAt);
-
-          productRepository.save(product);
-          return new ProductResponseDto(product.getId(), product.getName());
-      });
-
-      return createProductTask.get();
+      return createProductsThreadpool.submit(new CreateProductTask(productRequest, productRepository)).get();
   }
 
   @Override
@@ -111,4 +98,30 @@ class ProductFacadeImpl implements ProductFacade {
   public void delete(String id) {
     productRepository.deleteById(id);
   }
+}
+
+
+class CreateProductTask implements Callable<ProductResponseDto> {
+    private final ProductRequestDto productRequest;
+    private final ProductRepository productRepository;
+
+    CreateProductTask(ProductRequestDto productRequest, ProductRepository productRepository) {
+        this.productRequest = productRequest;
+        this.productRepository = productRepository;
+    }
+
+    @Override
+    public ProductResponseDto call() throws Exception {
+
+        if (!productRequest.isValid()) {
+            throw new ProductRequestNotValidException(productRequest);
+        }
+
+        String id = UUID.randomUUID().toString();
+        LocalDateTime createdAt = LocalDateTime.now();
+        Product product = new Product(id, productRequest.getName(), createdAt);
+
+        productRepository.save(product);
+        return new ProductResponseDto(product.getId(), product.getName());
+    }
 }
