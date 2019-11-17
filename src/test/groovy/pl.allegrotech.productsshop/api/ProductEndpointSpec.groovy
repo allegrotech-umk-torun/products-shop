@@ -18,7 +18,7 @@ class ProductEndpointSpec extends IntegrationSpec {
 
     def "should get product"() {
         given: "create new product"
-            def newProduct = new ProductRequestDto(null, "czerwona sukienka")
+            def newProduct = new ProductRequestDto(null, "czerwona sukienka", "100")
 
         and: "create new product"
             def createdProduct = productFacade.create(newProduct);
@@ -52,9 +52,21 @@ class ProductEndpointSpec extends IntegrationSpec {
             response.getBody().getName() == createdProduct.getName()
 
         where:
-            productRequest                                   | responseStatusCode | createdProduct
-            new ProductRequestDto(null, "czerwona sukienka") | OK                 | new ProductResponseDto("dummyId", "czerwona sukienka")
-            new ProductRequestDto(null, "czarne skarpetki")  | OK                 | new ProductResponseDto("dummyId", "czarne skarpetki")
+            productRequest                                          | responseStatusCode | createdProduct
+            new ProductRequestDto(null, "czerwona sukienka", "100") | OK                 | new ProductResponseDto("dummyId", "czerwona sukienka", "100")
+            new ProductRequestDto(null, "czarne skarpetki", "200")  | OK                 | new ProductResponseDto("dummyId", "czarne skarpetki", "200")
+    }
+
+    def "should allow changing currency"() {
+        given:
+            def productRequestJson = mapToJson(new ProductRequestDto(null, "czerwona sukienka", "100"))
+            def httpRequest = buildRequest(productRequestJson)
+
+        when:
+            def response = httpClient.postForEntity(url("/products"), httpRequest, ProductResponseDto)
+
+        then:
+            response.getBody()
     }
 
     private static HttpEntity<String> buildRequest(String json) {

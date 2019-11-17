@@ -27,7 +27,7 @@ public class ProductEndpointTest extends IntegrationTest {
   @Test
   public void shouldCreateProduct() {
     // given
-    var productRequest = new ProductRequestDto(null, "czerwona sukienka");
+    var productRequest = new ProductRequestDto(null, "czerwona sukienka", "100");
     var productRequestJson = mapToJson(productRequest);
     var httpRequest = buildRequest(productRequestJson);
 
@@ -41,12 +41,13 @@ public class ProductEndpointTest extends IntegrationTest {
     var productResponse = response.getBody();
     assertThat(productResponse.getId()).isNotBlank();
     assertThat(productResponse.getName()).isEqualTo("czerwona sukienka");
+    assertThat(productResponse.getPrice()).isEqualTo("100");
   }
 
   @Test
   public void shouldGetProduct() {
     // given
-    var product = new ProductRequestDto(null, "czerwona sukienka");
+    var product = new ProductRequestDto(null, "czerwona sukienka", "100");
     var createdProduct = productFacade.create(product);
     var url = url("/products/") + createdProduct.getId();
 
@@ -73,10 +74,10 @@ public class ProductEndpointTest extends IntegrationTest {
   @Test
   public void shouldUpdateProduct() {
     // given
-    var productRequest = new ProductRequestDto(null, "iphone");
+    var productRequest = new ProductRequestDto(null, "iphone", "100");
     var existingProduct = productFacade.create(productRequest);
 
-    var updateProductRequest = new ProductRequestDto(existingProduct.getId(), "samsung");
+    var updateProductRequest = new ProductRequestDto(existingProduct.getId(), "samsung", "200");
     var updateProductRequestJson = mapToJson(updateProductRequest);
 
     var url = url("/products/") + existingProduct.getId();
@@ -92,12 +93,13 @@ public class ProductEndpointTest extends IntegrationTest {
     var productResponseDto = response.getBody();
     assertThat(productResponseDto.getId()).isEqualTo(existingProduct.getId());
     assertThat(productResponseDto.getName()).isEqualTo("samsung");
+    assertThat(productResponseDto.getPrice()).isEqualTo("200");
   }
 
   @Test
   public void shouldDeleteProduct() {
     // given
-    var productRequest = new ProductRequestDto(null, "iphone");
+    var productRequest = new ProductRequestDto(null, "iphone", "100");
     var existingProduct = productFacade.create(productRequest);
     var url = url("/products/") + existingProduct.getId();
 

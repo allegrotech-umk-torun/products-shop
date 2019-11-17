@@ -1,5 +1,6 @@
 package pl.allegrotech.productsshop.domain;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import org.springframework.stereotype.Component;
@@ -25,11 +26,11 @@ class ProductFacadeImpl implements ProductFacade {
 
     String id = UUID.randomUUID().toString();
     LocalDateTime createdAt = LocalDateTime.now();
-    Product product = new Product(id, productRequest.getName(), createdAt);
+    Product product = new Product(id, productRequest.getName(), createdAt, new BigDecimal(productRequest.getPrice()));
 
     productRepository.save(product);
 
-    return new ProductResponseDto(product.getId(), product.getName());
+    return new ProductResponseDto(product.getId(), product.getName(), product.getPrice().toString());
   }
 
   @Override
@@ -40,7 +41,7 @@ class ProductFacadeImpl implements ProductFacade {
       throw new ProductNotFoundException(id);
     }
 
-    return new ProductResponseDto(product.getId(), product.getName());
+    return new ProductResponseDto(product.getId(), product.getName(), product.getPrice().toString());
   }
 
   @Override
@@ -51,10 +52,10 @@ class ProductFacadeImpl implements ProductFacade {
 
     var product = productRepository.findById(productRequest.getId());
     var productToUpdate =
-        new Product(product.getId(), productRequest.getName(), product.getCreatedAt());
+        new Product(product.getId(), productRequest.getName(), product.getCreatedAt(), new BigDecimal(productRequest.getPrice()));
     var updatedProduct = productRepository.save(productToUpdate);
 
-    return new ProductResponseDto(updatedProduct.getId(), updatedProduct.getName());
+    return new ProductResponseDto(updatedProduct.getId(), updatedProduct.getName(), updatedProduct.getPrice().toString());
   }
 
   @Override
