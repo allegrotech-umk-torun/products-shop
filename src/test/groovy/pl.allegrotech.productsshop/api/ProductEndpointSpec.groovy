@@ -16,20 +16,20 @@ import static org.springframework.http.HttpStatus.OK
 class ProductEndpointSpec extends IntegrationSpec {
 
     @Autowired
-    ProductFacade productFacade;
+    ProductFacade productFacade
 
     def "should get product"() {
         given: "create new product"
             def newProduct = new ProductRequestDto(null, "czerwona sukienka", "100")
 
         and: "create new product"
-            def createdProduct = productFacade.create(newProduct);
+            def createdProduct = productFacade.create(newProduct)
 
         and: "define url for get request"
-            def url = url("/products/") + createdProduct.getId();
+            def url = url("/products/") + createdProduct.getId()
 
         when: "retrieve product"
-            def response = httpClient.getForEntity(url, ProductResponseDto.class);
+            def response = httpClient.getForEntity(url, ProductResponseDto.class)
 
         then: "request should succeed"
             response.getStatusCode() == OK
@@ -85,9 +85,8 @@ class ProductEndpointSpec extends IntegrationSpec {
     }
 
     private static HttpEntity<String> buildRequest(String json) {
-        def headers = new HttpHeaders();
-        headers.set("Content-type", "application/json");
-
-        new HttpEntity<>(json, headers);
+        def headers = new HttpHeaders()
+        headers.set("Content-type", "application/json")
+        new HttpEntity<>(json, headers)
     }
 }
