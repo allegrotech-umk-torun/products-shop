@@ -1,5 +1,7 @@
 package pl.allegrotech.productsshop.api
 
+import com.github.tomakehurst.wiremock.client.WireMock
+import groovy.json.JsonOutput
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
@@ -59,14 +61,27 @@ class ProductEndpointSpec extends IntegrationSpec {
 
     def "should allow changing currency"() {
         given:
-            def productRequestJson = mapToJson(new ProductRequestDto(null, "czerwona sukienka", "100"))
-            def httpRequest = buildRequest(productRequestJson)
+        WireMock.stubFor(
+            WireMock.get(WireMock.urlEqualTo("/latest?base=PLN"))
+                .willReturn(WireMock.aResponse()
+                    .withHeader('Content-Type', 'application/json')
+                    .withBody(JsonOutput.toJson([
+                        rates: [
+                            PLN: 1.0,
+                            EUR: 0.2337
+                        ],
+                        base: 'PLN',
+                        date: '2019-11-15'
+                    ]))))
+
+            def createdProduct = productFacade.create(new ProductRequestDto(null, "czerwona sukienka", "100"))
+            def url = url("/products/") + createdProduct.getId() + "?currency=EUR"
 
         when:
-            def response = httpClient.postForEntity(url("/products"), httpRequest, ProductResponseDto)
+            def response = httpClient.getForEntity(url, ProductResponseDto.class)
 
         then:
-            response.getBody()
+            response.getBody().getPrice() == "23.37"
     }
 
     private static HttpEntity<String> buildRequest(String json) {

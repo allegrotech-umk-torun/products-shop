@@ -46,7 +46,12 @@ class ProductFacadeImpl implements ProductFacade {
       throw new ProductNotFoundException(id);
     }
 
-    return new ProductResponseDto(product.getId(), product.getName(), product.getPrice().toString());
+    var price = product.getPrice();
+    if (currency != null) {
+      price = currencyConverter.convertCurrency(price, "PLN", currency);
+    }
+
+    return new ProductResponseDto(product.getId(), product.getName(), price.toString());
   }
 
   @Override
