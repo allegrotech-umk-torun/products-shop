@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import pl.allegrotech.productsshop.domain.ProductFacade;
@@ -26,8 +27,9 @@ class ProductEndpoint {
   }
 
   @GetMapping(value = "/{id}", produces = APPLICATION_JSON_VALUE)
-  ProductResponseDto getProduct(@PathVariable String id) {
-    return productFacade.get(id);
+  ProductResponseDto getProduct(@PathVariable String id,
+                                @RequestParam(value = "currency", required = false) String currency) {
+    return productFacade.get(id, currency);
   }
 
   @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)

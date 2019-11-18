@@ -1,8 +1,10 @@
 package pl.allegrotech.productsshop.domain;
 
+import javax.annotation.Nullable;
+
 public interface ProductFacade {
 
-  ProductResponseDto get(String id);
+  ProductResponseDto get(String id, @Nullable String currency);
 
   ProductResponseDto create(ProductRequestDto productRequest);
 

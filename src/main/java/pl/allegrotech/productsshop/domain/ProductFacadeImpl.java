@@ -9,13 +9,18 @@ import pl.allegrotech.productsshop.api.ProductNotFoundException;
 import pl.allegrotech.productsshop.api.ProductRequestNotValidException;
 import pl.allegrotech.productsshop.infrastructure.ProductRepository;
 
+import javax.annotation.Nullable;
+
 @Component
 class ProductFacadeImpl implements ProductFacade {
 
   private final ProductRepository productRepository;
+  private final CurrencyConverter currencyConverter;
 
-  ProductFacadeImpl(ProductRepository productRepository) {
+  ProductFacadeImpl(ProductRepository productRepository,
+                    CurrencyConverter currencyConverter) {
     this.productRepository = productRepository;
+    this.currencyConverter = currencyConverter;
   }
 
   @Override
@@ -34,7 +39,7 @@ class ProductFacadeImpl implements ProductFacade {
   }
 
   @Override
-  public ProductResponseDto get(String id) {
+  public ProductResponseDto get(String id, @Nullable String currency) {
     var product = productRepository.findById(id);
 
     if (product == null) {

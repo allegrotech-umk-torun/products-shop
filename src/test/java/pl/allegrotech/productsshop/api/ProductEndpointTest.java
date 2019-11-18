@@ -108,7 +108,7 @@ public class ProductEndpointTest extends IntegrationTest {
 
     // then
     assertThat(response.getStatusCode()).isEqualTo(OK);
-    assertThatThrownBy(() -> productFacade.get(existingProduct.getId()))
+    assertThatThrownBy(() -> productFacade.get(existingProduct.getId(), null))
         .isInstanceOf(ProductNotFoundException.class)
         .hasMessage("There is no product with id: " + existingProduct.getId());
   }
