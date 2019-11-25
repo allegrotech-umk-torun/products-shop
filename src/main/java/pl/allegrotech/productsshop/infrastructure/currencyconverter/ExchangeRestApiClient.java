@@ -2,6 +2,7 @@ package pl.allegrotech.productsshop.infrastructure.currencyconverter;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
@@ -18,6 +19,7 @@ class ExchangeRestApiClient {
         this.baseUrl = baseUrl;
     }
 
+    @Retryable
     ExchangeRatesDto getExchangeRates(String base) {
         try {
             String url = String.format("%s/latest?base=%s", baseUrl, base);
