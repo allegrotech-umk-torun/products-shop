@@ -59,14 +59,15 @@ class ProductEndpointSpec extends IntegrationSpec {
 
     def "should allow changing currency"() {
         given:
-            def productRequestJson = mapToJson(new ProductRequestDto(null, "czerwona sukienka", "100"))
-            def httpRequest = buildRequest(productRequestJson)
+        def newProduct = new ProductRequestDto(null, "czerwona sukienka", "100")
+        def createdProduct = productFacade.create(newProduct);
+        def url = url("/products/") + createdProduct.getId() + "?currency=EUR";
 
         when:
-            def response = httpClient.postForEntity(url("/products"), httpRequest, ProductResponseDto)
+        def response = httpClient.getForEntity(url, ProductResponseDto.class);
 
         then:
-            response.getBody()
+        response.getBody().price == "50.0"
     }
 
     private static HttpEntity<String> buildRequest(String json) {
