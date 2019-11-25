@@ -3,6 +3,8 @@ package pl.allegrotech.productsshop.infrastructure.currencyconverter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 @Component
@@ -17,8 +19,13 @@ class ExchangeRestApiClient {
     }
 
     ExchangeRatesDto getExchangeRates(String base) {
-        String url = String.format("%s/latest?base=%s", baseUrl, base);
-        ResponseEntity<ExchangeRatesDto> response = http.getForEntity(url, ExchangeRatesDto.class);
-        return response.getBody();
+        try {
+            String url = String.format("%s/latest?base=%s", baseUrl, base);
+            ResponseEntity<ExchangeRatesDto> response = http.getForEntity(url, ExchangeRatesDto.class);
+            return response.getBody();
+        }
+        catch(HttpClientErrorException | HttpServerErrorException ex) {
+            throw new ExchangeRatesCommunicationError(ex.getStatusCode(), ex);
+        }
     }
 }

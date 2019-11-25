@@ -5,6 +5,7 @@ import groovy.json.JsonOutput
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
 import pl.allegrotech.productsshop.IntegrationSpec
 import pl.allegrotech.productsshop.domain.ProductFacade
 import pl.allegrotech.productsshop.domain.ProductRequestDto
@@ -82,6 +83,25 @@ class ProductEndpointSpec extends IntegrationSpec {
 
         then:
             response.getBody().getPrice() == "23.37"
+    }
+
+    def "should handle error"() {
+        given:
+            WireMock.stubFor(
+                    WireMock.get(WireMock.urlEqualTo("/latest?base=PLN"))
+                    .willReturn(WireMock.aResponse()
+                            .withHeader('Content-Type', 'text/plain')
+                            .withStatus(500)
+                            .withBody("Internal server error")))
+
+            def createdProduct = productFacade.create(new ProductRequestDto(null, "czerwona sukienka", "100"))
+            def url = url("/products/") + createdProduct.getId() + "?currency=EUR"
+
+        when:
+            def response = httpClient.getForEntity(url, Void.class)
+
+        then:
+            response.statusCode == HttpStatus.UNPROCESSABLE_ENTITY
     }
 
     private static HttpEntity<String> buildRequest(String json) {
