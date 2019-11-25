@@ -85,7 +85,7 @@ class ProductEndpointSpec extends IntegrationSpec {
             response.getBody().getPrice() == "23.37"
     }
 
-    def "should handle error"() {
+    def "should handle exchange rates client error error"() {
         given:
             WireMock.stubFor(
                     WireMock.get(WireMock.urlEqualTo("/latest?base=PLN"))
