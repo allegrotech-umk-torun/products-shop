@@ -9,8 +9,6 @@ import org.testcontainers.containers.GenericContainer
 @Configuration
 class MongoTestConfiguration {
 
-//    private static final int MONGO_PORT = 27017
-
     private final int mongoPort
 
     MongoTestConfiguration(@Value('\${mongo.integration.port}') int mongoPort) {
@@ -20,13 +18,13 @@ class MongoTestConfiguration {
     @Bean(initMethod = "start", destroyMethod = "stop")
     GenericContainer mongoContainer() {
         return new GenericContainer("mongo:3.4")
-                .withExposedPorts(MONGO_PORT)
+                .withExposedPorts(mongoPort)
     }
 
     @Bean
     MongoClient mongoClient(GenericContainer mongoContainer) {
         new MongoClient(
                 mongoContainer.containerIpAddress,
-                mongoContainer.getMappedPort(MONGO_PORT))
+                mongoContainer.getMappedPort(mongoPort))
     }
 }
