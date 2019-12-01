@@ -40,12 +40,12 @@ public class ProductRequestDto {
         return price;
     }
 
-  @Override
-  public String toString() {
-    return "ProductRequestDto{" +
-            "id='" + id + '\'' +
-            ", name='" + name + '\'' +
-            ", price='" + price + '\'' +
-            '}';
-  }
+    @Override
+    public String toString() {
+        return "ProductRequestDto{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", price='" + price + '\'' +
+                '}';
+    }
 }

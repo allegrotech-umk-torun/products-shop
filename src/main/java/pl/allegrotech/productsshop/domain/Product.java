@@ -1,10 +1,10 @@
 package pl.allegrotech.productsshop.domain;
 
+import org.springframework.data.annotation.Id;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Objects;
-
-import org.springframework.data.annotation.Id;
 
 public final class Product {
 
