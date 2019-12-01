@@ -1,8 +1,12 @@
 package pl.allegrotech.productsshop.api
 
+import com.github.tomakehurst.wiremock.client.WireMock
+import com.github.tomakehurst.wiremock.stubbing.Scenario
+import groovy.json.JsonOutput
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
 import pl.allegrotech.productsshop.IntegrationSpec
 import pl.allegrotech.productsshop.domain.ProductFacade
 import pl.allegrotech.productsshop.domain.ProductRequestDto
@@ -14,20 +18,20 @@ import static org.springframework.http.HttpStatus.OK
 class ProductEndpointSpec extends IntegrationSpec {
 
     @Autowired
-    ProductFacade productFacade;
+    ProductFacade productFacade
 
     def "should get product"() {
         given: "create new product"
-            def newProduct = new ProductRequestDto(null, "czerwona sukienka")
+            def newProduct = new ProductRequestDto(null, "czerwona sukienka", "100")
 
         and: "create new product"
-            def createdProduct = productFacade.create(newProduct);
+            def createdProduct = productFacade.create(newProduct)
 
         and: "define url for get request"
-            def url = url("/products/") + createdProduct.getId();
+            def url = url("/products/") + createdProduct.getId()
 
         when: "retrieve product"
-            def response = httpClient.getForEntity(url, ProductResponseDto.class);
+            def response = httpClient.getForEntity(url, ProductResponseDto.class)
 
         then: "request should succeed"
             response.getStatusCode() == OK
@@ -52,15 +56,98 @@ class ProductEndpointSpec extends IntegrationSpec {
             response.getBody().getName() == createdProduct.getName()
 
         where:
-            productRequest                                   | responseStatusCode | createdProduct
-            new ProductRequestDto(null, "czerwona sukienka") | OK                 | new ProductResponseDto("dummyId", "czerwona sukienka")
-            new ProductRequestDto(null, "czarne skarpetki")  | OK                 | new ProductResponseDto("dummyId", "czarne skarpetki")
+            productRequest                                          | responseStatusCode | createdProduct
+            new ProductRequestDto(null, "czerwona sukienka", "100") | OK                 | new ProductResponseDto("dummyId", "czerwona sukienka", "100")
+            new ProductRequestDto(null, "czarne skarpetki", "200")  | OK                 | new ProductResponseDto("dummyId", "czarne skarpetki", "200")
+    }
+
+    def "should allow changing currency"() {
+        given:
+        WireMock.stubFor(
+            WireMock.get(WireMock.urlEqualTo("/latest?base=PLN"))
+                .willReturn(WireMock.aResponse()
+                    .withHeader('Content-Type', 'application/json')
+                    .withBody(JsonOutput.toJson([
+                        rates: [
+                            PLN: 1.0,
+                            EUR: 0.2337
+                        ],
+                        base: 'PLN',
+                        date: '2019-11-15'
+                    ]))))
+
+            def createdProduct = productFacade.create(new ProductRequestDto(null, "czerwona sukienka", "100"))
+            def url = url("/products/") + createdProduct.getId() + "?currency=EUR"
+
+        when:
+            def response = httpClient.getForEntity(url, ProductResponseDto.class)
+
+        then:
+            response.getBody().getPrice() == "23.37"
+    }
+
+    def "should handle exchange rates client error error"() {
+        given:
+            WireMock.stubFor(
+                    WireMock.get(WireMock.urlEqualTo("/latest?base=PLN"))
+                    .willReturn(WireMock.aResponse()
+                            .withHeader('Content-Type', 'text/plain')
+                            .withStatus(500)
+                            .withBody("Internal server error")))
+
+            def createdProduct = productFacade.create(new ProductRequestDto(null, "czerwona sukienka", "100"))
+            def url = url("/products/") + createdProduct.getId() + "?currency=EUR"
+
+        when:
+            def response = httpClient.getForEntity(url, Void.class)
+
+        then:
+            response.statusCode == HttpStatus.UNPROCESSABLE_ENTITY
+    }
+
+    def "should retry exchange rates request on error"() {
+        given:
+            WireMock.stubFor(
+                    WireMock.get(WireMock.urlEqualTo("/latest?base=PLN"))
+                            .inScenario("Retry")
+                            .whenScenarioStateIs(Scenario.STARTED)
+                            .willSetStateTo("OK")
+                            .willReturn(WireMock.aResponse()
+                                    .withHeader('Content-Type', 'text/plain')
+                                    .withStatus(500)
+                                    .withBody("Internal server error")))
+
+            WireMock.stubFor(
+                    WireMock.get(WireMock.urlEqualTo("/latest?base=PLN"))
+                            .inScenario("Retry")
+                            .whenScenarioStateIs("OK")
+                            .willReturn(WireMock.aResponse()
+                                    .withHeader('Content-Type', 'application/json')
+                                    .withBody(JsonOutput.toJson([
+                                            rates: [
+                                                    PLN: 1.0,
+                                                    EUR: 0.2337
+                                            ],
+                                            base: 'PLN',
+                                            date: '2019-11-15'
+                                    ]))))
+
+            def createdProduct = productFacade.create(new ProductRequestDto(null, "czerwona sukienka", "100"))
+            def url = url("/products/") + createdProduct.getId() + "?currency=EUR"
+
+        when:
+            def response = httpClient.getForEntity(url, ProductResponseDto.class)
+
+        then:
+            response.statusCode.is2xxSuccessful()
+            response.getBody().getPrice() == "23.37"
+
+
     }
 
     private static HttpEntity<String> buildRequest(String json) {
-        def headers = new HttpHeaders();
-        headers.set("Content-type", "application/json");
-
-        new HttpEntity<>(json, headers);
+        def headers = new HttpHeaders()
+        headers.set("Content-type", "application/json")
+        new HttpEntity<>(json, headers)
     }
 }

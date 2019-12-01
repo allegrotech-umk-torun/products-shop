@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import pl.allegrotech.productsshop.infrastructure.currencyconverter.ExchangeRatesCommunicationError;
+
 @ControllerAdvice
 public class ApiExceptionHandler {
 
@@ -25,5 +27,12 @@ public class ApiExceptionHandler {
   @ExceptionHandler(ProductIdIncorrectException.class)
   public ResponseEntity handleProductIdIncorrect(ProductIdIncorrectException exception) {
     return new ResponseEntity(exception.getMessage(), HttpStatus.BAD_REQUEST);
+  }
+
+  @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+  @ExceptionHandler(ExchangeRatesCommunicationError.class)
+  public ResponseEntity handleExchangeRatesCommunicationError(
+      ExchangeRatesCommunicationError exception) {
+    return new ResponseEntity(exception.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
   }
 }

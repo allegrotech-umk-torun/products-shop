@@ -6,11 +6,12 @@ import spock.lang.Specification
 class ProductFacadeSpec extends Specification {
 
     def inMemoryProductRepository = new InMemoryProductRepository()
-    ProductFacade productFacade = new ProductFacadeImpl(inMemoryProductRepository)
+    def currencyConverter = Mock(CurrencyConverter)
+    def productFacade = new ProductFacadeImpl(inMemoryProductRepository, currencyConverter)
 
     def "should create product and store in repository" () {
         given: "requested document"
-            def requestedDocument = new ProductRequestDto("997", "unit_test_document")
+            def requestedDocument = new ProductRequestDto("997", "unit_test_document", "10")
 
         when: "request document storage"
             def savedDocument = productFacade.create(requestedDocument)

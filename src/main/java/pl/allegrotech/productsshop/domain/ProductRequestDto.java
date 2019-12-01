@@ -11,11 +11,16 @@ public class ProductRequestDto {
 
   private final String id;
   private final String name;
+  private final String price;
 
   @JsonCreator
-  public ProductRequestDto(@JsonProperty("id") String id, @JsonProperty("name") String name) {
+  public ProductRequestDto(
+      @JsonProperty("id") String id,
+      @JsonProperty("name") String name,
+      @JsonProperty("price") String price) {
     this.id = id;
     this.name = name;
+    this.price = price;
   }
 
   @JsonIgnore
@@ -31,8 +36,22 @@ public class ProductRequestDto {
     return name;
   }
 
+  public String getPrice() {
+    return price;
+  }
+
   @Override
   public String toString() {
-    return "ProductRequestDto{" + "id='" + id + '\'' + ", name='" + name + '\'' + '}';
+    return "ProductRequestDto{"
+        + "id='"
+        + id
+        + '\''
+        + ", name='"
+        + name
+        + '\''
+        + ", price='"
+        + price
+        + '\''
+        + '}';
   }
 }
