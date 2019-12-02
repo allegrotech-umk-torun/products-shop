@@ -15,12 +15,10 @@ class RestClientConfig {
     public RestTemplate exchangeRestTemplate(
             RestTemplateBuilder restTemplateBuilder,
             @Value("${client.exchange.connection-timeout:100}") int connectionTimeout,
-            @Value("${client.exchange.read-timeout:1000}") int readTimeout
-    ) {
+            @Value("${client.exchange.read-timeout:1000}") int readTimeout) {
         return restTemplateBuilder
                 .setConnectTimeout(Duration.ofMillis(connectionTimeout))
                 .setReadTimeout(Duration.ofMillis(readTimeout))
                 .build();
     }
-
 }

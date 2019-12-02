@@ -41,9 +41,9 @@ class ExchangeRatesDto {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ExchangeRatesDto that = (ExchangeRatesDto) o;
-        return Objects.equals(base, that.base) &&
-                Objects.equals(date, that.date) &&
-                Objects.equals(rates, that.rates);
+        return Objects.equals(base, that.base)
+                && Objects.equals(date, that.date)
+                && Objects.equals(rates, that.rates);
     }
 
     @Override
@@ -60,4 +60,3 @@ class ExchangeRatesDto {
                 '}';
     }
 }
-

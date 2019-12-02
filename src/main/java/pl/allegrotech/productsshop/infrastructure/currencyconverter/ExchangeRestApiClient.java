@@ -13,8 +13,8 @@ class ExchangeRestApiClient {
     private final RestTemplate http;
     private final String baseUrl;
 
-    ExchangeRestApiClient(RestTemplate exchangeRestTemplate,
-                          @Value("${client.exchange.url}") String baseUrl) {
+    ExchangeRestApiClient(
+            RestTemplate exchangeRestTemplate, @Value("${client.exchange.url}") String baseUrl) {
         this.http = exchangeRestTemplate;
         this.baseUrl = baseUrl;
     }
@@ -25,8 +25,7 @@ class ExchangeRestApiClient {
             String url = String.format("%s/latest?base=%s", baseUrl, base);
             ResponseEntity<ExchangeRatesDto> response = http.getForEntity(url, ExchangeRatesDto.class);
             return response.getBody();
-        }
-        catch(HttpClientErrorException | HttpServerErrorException ex) {
+        } catch (HttpClientErrorException | HttpServerErrorException ex) {
             throw new ExchangeRatesCommunicationError(ex.getStatusCode(), ex);
         }
     }

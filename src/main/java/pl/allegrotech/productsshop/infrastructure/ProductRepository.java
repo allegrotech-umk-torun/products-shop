@@ -1,12 +1,15 @@
 package pl.allegrotech.productsshop.infrastructure;
 
+import org.springframework.data.repository.Repository;
 import pl.allegrotech.productsshop.domain.Product;
 
-public interface ProductRepository {
+import java.util.Optional;
 
-  Product save(Product product);
+public interface ProductRepository extends Repository<Product, String> {
 
-  Product findById(String id);
+    Product save(Product product);
 
-  void removeById(String id);
+    Optional<Product> findById(String id);
+
+    void deleteById(String id);
 }

@@ -28,8 +28,35 @@ dependencies {
     implementation 'org.springframework.retry:spring-retry'
     implementation 'org.springframework:spring-aspects'
     implementation 'com.google.guava:guava:27.1-jre'
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.spockframework:spock-core:1.3-groovy-2.5'
     testImplementation 'org.spockframework:spock-spring:1.3-groovy-2.5'
+    testImplementation 'org.testcontainers:spock:1.11.4'
     testImplementation 'com.github.tomakehurst:wiremock-jre8:2.25.1'
 }
+
+configurations {
+    integrationTestCompile.extendsFrom testImplementation
+    integrationTestRuntime.extendsFrom testRuntime
+}
+
+sourceSets {
+    integrationTest {
+        groovy {
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
+            srcDir file('src/integration/groovy')
+        }
+        resources.srcDir file('src/integration/resources')
+    }
+}
+
+task integrationTest(type: Test) {
+    description = 'Run the integration tests.'
+    group = 'verification'
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+}
+
+check.dependsOn(integrationTest, test)
